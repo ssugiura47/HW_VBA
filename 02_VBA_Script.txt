@@ -1,0 +1,97 @@
+Sub VBA_HW()
+
+Dim ws As Worksheet
+Dim Ticker As String
+Dim outputrow As Integer
+Dim opened, closed, change As Double
+Dim voltotal, lastrow As Long
+
+For Each ws In Worksheets
+
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly_Change"
+ws.Cells(1, 11).Value = "Percent_Change"
+ws.Cells(1, 12).Value = "Total_Stock_Volumn"
+
+outputrow = 2
+lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+lastpercentrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+Ticker = ws.Cells(2, 1).Value
+opened = ws.Cells(2, 3).Value
+voltotal = 0
+
+For i = 2 To lastrow
+
+
+If (Ticker <> ws.Cells(i, 1).Value) And (opened <> 0) Then
+    ws.Cells(outputrow, 9).Value = Ticker
+    closed = ws.Cells(i - 1, 6).Value
+    change = (closed - opened)
+         
+    ws.Cells(outputrow, 10).Value = change
+    ws.Cells(outputrow, 11).Value = change / opened
+    ws.Range("L" & outputrow).Value = voltotal
+    
+    voltotal = voltotal + ws.Cells(i, 7).Value
+    
+    voltotal = 0
+    outputrow = outputrow + 1
+    Ticker = ws.Cells(i, 1).Value
+    opened = ws.Cells(i, 3).Value
+        
+ElseIf (Ticker <> ws.Cells(i, 1).Value) And (opened = 0) Then
+    ws.Cells(outputrow, 9).Value = Ticker
+    closed = ws.Cells(i - 1, 6).Value
+    change = (closed - opened)
+         
+    ws.Cells(outputrow, 10).Value = change
+    ws.Cells(outputrow, 11).Value = 0
+    voltotal = voltotal + ws.Cells(i, 7).Value
+    ws.Cells(outputrow, 12).Value = voltotal
+    
+    voltotal = 0
+    outputrow = outputrow + 1
+    Ticker = ws.Cells(i, 1).Value
+    opened = ws.Cells(i, 3).Value
+    
+Else
+    voltotal = voltotal + ws.Cells(i, 7).Value
+End If
+
+
+Next i
+
+Next ws
+
+End Sub
+
+Sub percent()
+
+Dim ws As Worksheet
+Dim percent As Double
+Dim lastpercentrow As Long
+
+For Each ws In Worksheets
+
+lastpercentrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+For i = 2 To lastpercentrow
+
+percent = ws.Cells(i, 11).Value
+ws.Cells(i, 11).NumberFormat = "0.00%"
+
+If (percent > 0) Then
+    ws.Cells(i, 11).Interior.ColorIndex = 4
+
+ElseIf (percent < 0) Then
+    ws.Cells(i, 11).Interior.ColorIndex = 3
+
+End If
+
+Next i
+
+Next ws
+
+End Sub
+
+
